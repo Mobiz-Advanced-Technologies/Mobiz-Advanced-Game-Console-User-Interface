@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobiz-Advanced-Game-Console-User-Interface</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="gridnavs">
+    <div id="clockandgreetings">
+      <h3 id="greet">Press any key to start.</h3>
+      <h1 id="span">12:00</h1>
+      <h3 id="wttr">Getting latest weather information...</h3>
+    </div>
+    <div id="controlshelp" style="display: none;">
+      <b>WASD</b> Move
+      <b>Space</b> Select
+    </div>
+    <ul class="gridnav" id="links" data-amount="5" data-element="button" style="display: none;">
+
+
+
+    </ul>
+  </section>
+
+  <script src="gridnav.js"></script>
+
+  <script>
+    var consoleUnlocked = false
+
+    // Prevent anchor navigation
+    document.querySelector('#gridnavs').
+      addEventListener('click',function(ev) {
+        ev.preventDefault();
+      }
+    );
+
+    document.addEventListener('keydown',function(ev) {
+      if (consoleUnlocked == false) {
+        consoleUnlocked = true;
+        document.getElementById('clockandgreetings').style.marginTop = 0;
+        document.getElementById('greet').innerText = 'Welcome back, Guest!';
+        let clicksound = new Audio('confirmation_001.ogg');
+        clicksound.play();
+
+        setTimeout(function() {
+          document.getElementById('links').style.display = 'block'
+          document.getElementById('controlshelp').style.display = 'block'
+          document.querySelector("button").focus();
+        }, 1000);
+      }
+    }
+    );
+
+    fetch('https://wttr.in/London?format=3')
+      .then((response) => response.text())
+      .then((text) => {
+        document.getElementById('wttr').innerText = text;
+      });
+
+    var span = document.getElementById('span');
+
+    function time() {
+      var d = new Date();
+      var s = d.getSeconds();
+      var m = d.getMinutes();
+      var h = d.getHours();
+      span.textContent = 
+        (" ") + ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2);
+    };
+
+    setInterval(time)
+
+    fetch("https://bobuxstation.github.io/Coal-Web/games.json")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => 
+        data.items.forEach(items => {
+            let gameList = document.getElementById("links");
+            let btn = document.createElement("button");
+            let li = document.createElement("li");
+            btn.innerHTML = `<p>${items.name}</p>`;
+
+            btn.style.backgroundImage = "url(" + items.banner + ")";
+            btn.onclick = () => {
+              btn.setAttribute("class", "gameopening");
+              let clicksound = new Audio('toggle_002.ogg');
+              clicksound.play();
+              setTimeout(function() {
+                window.location.href = items.link;
+              }, 250);
+            };
+
+            btn.onfocus = () => {
+              let clicksound = new Audio('click_002.ogg');
+              clicksound.play();
+            };
+
+            li.appendChild(btn);
+            gameList.appendChild(li)
+
+            var smallerlist = new Gridnav('#links');
+      }));
+  </script>
+
+</body>
+</html>
